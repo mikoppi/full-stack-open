@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import AddPerson from "./components/AddPerson";
 import Filter from "./components/Filter";
 import Persons from "./components/Persons";
-import axios from 'axios'
+import personService from "./services/personService";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
@@ -12,13 +12,10 @@ const App = () => {
   const [filteredPersons, setFilteredPersons] = useState([]);
 
   useEffect(() => {
-    axios
-    .get('http://localhost:3001/persons')
-    .then(response => {
-      setPersons(response.data)
-    })
-
-  },[])
+    personService.getAll().then((initialPersons) => {
+      setPersons(initialPersons);
+    });
+  }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -26,11 +23,27 @@ const App = () => {
       name: newName,
       number: newNumber,
     };
-    persons.some((person) => person.name === newName)
-      ? alert(`${newName} is already added to phonebook`)
-      : setPersons(persons.concat(personObject));
-    setNewName("");
-    setNewNumber("");
+    if (
+      persons.some((person) => person.name === newName) &&
+      window.confirm(
+        `${newName} is already added to phonebook, replace the old number with a new one?`
+      )
+    ) {
+      let personToUpdate = persons.find(person => person.name === newName)
+      let filteredPersonToUpdate = filteredPersons.find(person => person.name === newName)
+      personService.update(personToUpdate.id, personObject).then((returnedPerson) => {
+        setPersons(persons.map(person => person.id !== personToUpdate.id ? person : returnedPerson))
+        setFilteredPersons(filteredPersons.map(person => person.id !== filteredPersonToUpdate.id ? person : returnedPerson))
+        setNewName("");
+        setNewNumber("");
+      })
+    } else {
+      personService.create(personObject).then((returnedPerson) => {
+        setPersons(persons.concat(returnedPerson));
+        setNewName("");
+        setNewNumber("");
+      });
+    }
   };
 
   const handleNameChange = (e) => {
@@ -52,6 +65,15 @@ const App = () => {
     console.log(newFilter);
   };
 
+  const handleDelete = (id, name) => {
+    if (window.confirm(`Delete ${name}`)) {
+      personService
+        .deleteItem(id)
+        .then(setPersons(persons.filter((person) => person.id !== id)))
+        .then(setFilteredPersons(filteredPersons.filter((person) => person.id !== id)));
+    }
+  };
+
   return (
     <div>
       <h2>Phonebook</h2>
@@ -65,7 +87,11 @@ const App = () => {
         handleNumberChange={handleNumberChange}
       />
       <h2>Numbers</h2>
-      <Persons persons={newFilter !== "" ? filteredPersons : persons} />
+      <Persons
+      //not the best idea to alternate between two states as props
+        persons={newFilter !== "" ? filteredPersons : persons}
+        handleDelete={handleDelete}
+      />
     </div>
   );
 };
