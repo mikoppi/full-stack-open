@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import AddPerson from "./components/AddPerson";
 import Filter from "./components/Filter";
+import Notification from "./components/Notification";
 import Persons from "./components/Persons";
 import personService from "./services/personService";
 
@@ -10,6 +11,8 @@ const App = () => {
   const [newNumber, setNewNumber] = useState("");
   const [newFilter, setNewFilter] = useState("");
   const [filteredPersons, setFilteredPersons] = useState([]);
+  const [message, setMessage] = useState(null);
+  const [success, setSuccess] = useState(true);
 
   useEffect(() => {
     personService.getAll().then((initialPersons) => {
@@ -29,19 +32,47 @@ const App = () => {
         `${newName} is already added to phonebook, replace the old number with a new one?`
       )
     ) {
-      let personToUpdate = persons.find(person => person.name === newName)
-      let filteredPersonToUpdate = filteredPersons.find(person => person.name === newName)
-      personService.update(personToUpdate.id, personObject).then((returnedPerson) => {
-        setPersons(persons.map(person => person.id !== personToUpdate.id ? person : returnedPerson))
-        setFilteredPersons(filteredPersons.map(person => person.id !== filteredPersonToUpdate.id ? person : returnedPerson))
-        setNewName("");
-        setNewNumber("");
-      })
+      let personToUpdate = persons.find((person) => person.name === newName);
+      let filteredPersonToUpdate = filteredPersons.find(
+        (person) => person.name === newName
+      );
+      personService
+        .update(personToUpdate.id, personObject)
+        .then((returnedPerson) => {
+          setPersons(
+            persons.map((person) =>
+              person.id !== personToUpdate.id ? person : returnedPerson
+            )
+          );
+          setFilteredPersons(
+            filteredPersons.map((person) =>
+              person.id !== filteredPersonToUpdate.id ? person : returnedPerson
+            )
+          );
+          setNewName("");
+          setNewNumber("");
+          setSuccess(true);
+          setMessage(`Changed number for ${personToUpdate.name}`);
+          setTimeout(() => {
+            setMessage(null);
+          }, 5000);
+        }).catch(error => {
+          setSuccess(false)
+          setMessage(`Information of ${newName} has already been removed from server`)
+          setTimeout(() => {
+            setMessage(null);
+          }, 5000);
+        })
     } else {
       personService.create(personObject).then((returnedPerson) => {
         setPersons(persons.concat(returnedPerson));
         setNewName("");
         setNewNumber("");
+        setSuccess(true);
+        setMessage(`Added ${returnedPerson.name}`);
+        setTimeout(() => {
+          setMessage(null);
+        }, 5000);
       });
     }
   };
@@ -70,13 +101,31 @@ const App = () => {
       personService
         .deleteItem(id)
         .then(setPersons(persons.filter((person) => person.id !== id)))
-        .then(setFilteredPersons(filteredPersons.filter((person) => person.id !== id)));
+        .then(
+          setFilteredPersons(
+            filteredPersons.filter((person) => person.id !== id)
+          )
+        )
+        .then(() => {
+          setSuccess(true);
+          setMessage(`Deleted ${name}`);
+          setTimeout(() => {
+            setMessage(null);
+          }, 5000);
+        }).catch(error => {
+          setSuccess(false)
+          setMessage(`${name} has already been removed from server`)
+          setTimeout(() => {
+            setMessage(null);
+          }, 5000);
+        })
     }
   };
 
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={message} success={success} />
       <Filter newFilter={newFilter} handleFilterChange={handleFilterChange} />
       <h2>add a new</h2>
       <AddPerson
@@ -88,7 +137,7 @@ const App = () => {
       />
       <h2>Numbers</h2>
       <Persons
-      //not the best idea to alternate between two states as props
+        //not the best idea to alternate between two states as props
         persons={newFilter !== "" ? filteredPersons : persons}
         handleDelete={handleDelete}
       />
