@@ -5,10 +5,10 @@ const AddPerson = ({handleSubmit, handleNameChange, handleNumberChange, newName,
     <div>
         <form onSubmit={handleSubmit}>
         <div>
-          name: <input onChange={handleNameChange} value={newName} />
+          name: <input value={newName} onChange={handleNameChange}  />
         </div>
         <div>
-          number: <input onChange={handleNumberChange} value={newNumber} />
+          number: <input value={newNumber} onChange={handleNumberChange} />
         </div>
         <div>
           <button type="submit">add</button>

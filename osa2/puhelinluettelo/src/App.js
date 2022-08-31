@@ -11,7 +11,7 @@ const App = () => {
   const [newNumber, setNewNumber] = useState("");
   const [newFilter, setNewFilter] = useState("");
   const [filteredPersons, setFilteredPersons] = useState([]);
-  const [message, setMessage] = useState(null);
+  const [message, setMessage] = useState("");
   const [success, setSuccess] = useState(true);
 
   useEffect(() => {
@@ -54,26 +54,35 @@ const App = () => {
           setSuccess(true);
           setMessage(`Changed number for ${personToUpdate.name}`);
           setTimeout(() => {
-            setMessage(null);
+            setMessage("");
           }, 5000);
         }).catch(error => {
           setSuccess(false)
           setMessage(`Information of ${newName} has already been removed from server`)
           setTimeout(() => {
-            setMessage(null);
+            setMessage("");
           }, 5000);
         })
     } else {
-      personService.create(personObject).then((returnedPerson) => {
+      personService
+      .create(personObject)
+      .then(returnedPerson => {
+        console.log(returnedPerson)
         setPersons(persons.concat(returnedPerson));
+        setMessage(`Added ${personObject.name}`);
         setNewName("");
         setNewNumber("");
         setSuccess(true);
-        setMessage(`Added ${returnedPerson.name}`);
-        setTimeout(() => {
-          setMessage(null);
+      })
+      .catch(error => {
+        setSuccess(false)
+        setMessage(`${error.response.data.error}`);
+        console.log(error.response.data);
+      })
+
+      setTimeout(() => {
+          setMessage("");
         }, 5000);
-      });
     }
   };
 
@@ -110,13 +119,13 @@ const App = () => {
           setSuccess(true);
           setMessage(`Deleted ${name}`);
           setTimeout(() => {
-            setMessage(null);
+            setMessage("");
           }, 5000);
         }).catch(error => {
           setSuccess(false)
           setMessage(`${name} has already been removed from server`)
           setTimeout(() => {
-            setMessage(null);
+            setMessage("");
           }, 5000);
         })
     }
