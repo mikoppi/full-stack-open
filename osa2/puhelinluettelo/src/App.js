@@ -77,7 +77,6 @@ const App = () => {
       .catch(error => {
         setSuccess(false)
         setMessage(`${error.response.data.error}`);
-        console.log(error.response.data);
       })
 
       setTimeout(() => {
