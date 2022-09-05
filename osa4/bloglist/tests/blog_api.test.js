@@ -72,26 +72,26 @@ test("likes are never undefined, if value not given, its 0 ", async () => {
 test("empty field not allowed on title", async () => {
   const newBlog = {
     author: "mikoppi",
-    url:"www.fsfdfsf.com",
+    url: "www.fsfdfsf.com",
     likes: 4,
   };
   await api.post("/api/blogs").send(newBlog).expect(400);
-  const blogsAtEnd = await helper.blogsInDb()
+  const blogsAtEnd = await helper.blogsInDb();
 
-  expect(blogsAtEnd).toHaveLength(helper.testBlogs.length)
-},10000);
+  expect(blogsAtEnd).toHaveLength(helper.testBlogs.length);
+}, 10000);
 
 test("empty field not allowed on url", async () => {
   const newBlog = {
     author: "mikoppi",
-    title:"hello",
+    title: "hello",
     likes: 4,
   };
   await api.post("/api/blogs").send(newBlog).expect(400);
-  const blogsAtEnd = await helper.blogsInDb()
+  const blogsAtEnd = await helper.blogsInDb();
 
-  expect(blogsAtEnd).toHaveLength(helper.testBlogs.length)
-},10000);
+  expect(blogsAtEnd).toHaveLength(helper.testBlogs.length);
+}, 10000);
 
 test("empty fields not allowed on url and title at the same time", async () => {
   const newBlog = {
@@ -99,10 +99,43 @@ test("empty fields not allowed on url and title at the same time", async () => {
     likes: 4,
   };
   await api.post("/api/blogs").send(newBlog).expect(400);
-  const blogsAtEnd = await helper.blogsInDb()
+  const blogsAtEnd = await helper.blogsInDb();
 
-  expect(blogsAtEnd).toHaveLength(helper.testBlogs.length)
-},10000);
+  expect(blogsAtEnd).toHaveLength(helper.testBlogs.length);
+}, 10000);
+
+test("succeeds with status code 204 if id is valid", async () => {
+  const blogsAtStart = await helper.blogsInDb();
+  const blogToDelete = blogsAtStart[0];
+
+  await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204);
+
+  const blogsAtEnd = await helper.blogsInDb();
+
+  expect(blogsAtEnd).toHaveLength(helper.testBlogs.length - 1);
+
+  const contents = blogsAtEnd.map((r) => r.title);
+
+  expect(contents).not.toContain(blogToDelete.content);
+});
+
+test("updated blog contains the updated likes", async () => {
+  const blogsAtStart = await helper.blogsInDb();
+  const blogToUpdate = blogsAtStart[0];
+
+  const newBlog = {
+    likes: 500,
+  }
+
+  await api.put(`/api/blogs/${blogToUpdate.id}`).send(newBlog).expect(200);
+
+  const blogsAtEnd = await helper.blogsInDb();
+
+  expect(blogsAtEnd).toHaveLength(helper.testBlogs.length);
+  const contents = blogsAtEnd.map((r) => r.likes);
+
+  expect(contents).toContain(newBlog.likes);
+})
 
 afterAll(() => {
   mongoose.connection.close();
