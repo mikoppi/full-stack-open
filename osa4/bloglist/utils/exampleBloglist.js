@@ -49,5 +49,22 @@ const blogs = [
   },
 ];
 
+const testUsers = [
+  {
+    username: "testUser1",
+    name: "tester1",
+    password: "secret1",
+  },
+  {
+    username: "testUser2",
+    name: "tester2",
+    password: "secret2",
+  },
+];
 
-module.exports = blogs
+const loggedUser = {
+  username: "testUser1",
+  password: "secret1",
+};
+
+module.exports = { blogs, testUsers, loggedUser };

@@ -2,13 +2,25 @@ const mongoose = require("mongoose");
 const supertest = require("supertest");
 const app = require("../app");
 const Blog = require("../models/blog");
+const User = require("../models/user");
 const helper = require("./test_helper");
 
 const api = supertest(app);
+let loggedUserToken;
 
 beforeEach(async () => {
+  //post testusers
+  await User.deleteMany({});
+  await api.post("/api/users").send(helper.testUsers[0]);
+  const res = await api.post("/api/login").send(helper.loggedUser);
+  loggedUserToken = res.body.token;
+
+  //post testblogs
   await Blog.deleteMany({});
-  await Blog.insertMany(helper.testBlogs);
+  await api
+    .post("/api/blogs")
+    .set("Authorization", `bearer ${loggedUserToken}`)
+    .send(helper.testBlogs[0]);
 });
 
 test("blogs are returned as json", async () => {
@@ -20,7 +32,7 @@ test("blogs are returned as json", async () => {
 
 test("all blogs are returned", async () => {
   const response = await api.get("/api/blogs");
-  expect(response.body).toHaveLength(helper.testBlogs.length);
+  expect(response.body).toHaveLength(1);
 });
 
 test("returned blogs have a key called 'id'", async () => {
@@ -39,12 +51,12 @@ test("a valid blog can be added ", async () => {
 
   await api
     .post("/api/blogs")
+    .set("Authorization", `bearer ${loggedUserToken}`)
     .send(newBlog)
     .expect(201)
     .expect("Content-Type", /application\/json/);
 
   const blogsAtEnd = await helper.blogsInDb();
-  expect(blogsAtEnd).toHaveLength(helper.testBlogs.length + 1);
 
   const contents = blogsAtEnd.map((n) => n.title);
   expect(contents).toContain("valid blog");
@@ -59,6 +71,7 @@ test("likes are never undefined, if value not given, its 0 ", async () => {
 
   await api
     .post("/api/blogs")
+    .set("Authorization", `bearer ${loggedUserToken}`)
     .send(newBlog)
     .expect(201)
     .expect("Content-Type", /application\/json/);
@@ -75,10 +88,11 @@ test("empty field not allowed on title", async () => {
     url: "www.fsfdfsf.com",
     likes: 4,
   };
-  await api.post("/api/blogs").send(newBlog).expect(400);
-  const blogsAtEnd = await helper.blogsInDb();
-
-  expect(blogsAtEnd).toHaveLength(helper.testBlogs.length);
+  await api
+    .post("/api/blogs")
+    .set("Authorization", `bearer ${loggedUserToken}`)
+    .send(newBlog)
+    .expect(400);
 }, 10000);
 
 test("empty field not allowed on url", async () => {
@@ -87,10 +101,11 @@ test("empty field not allowed on url", async () => {
     title: "hello",
     likes: 4,
   };
-  await api.post("/api/blogs").send(newBlog).expect(400);
-  const blogsAtEnd = await helper.blogsInDb();
-
-  expect(blogsAtEnd).toHaveLength(helper.testBlogs.length);
+  await api
+    .post("/api/blogs")
+    .set("Authorization", `bearer ${loggedUserToken}`)
+    .send(newBlog)
+    .expect(400);
 }, 10000);
 
 test("empty fields not allowed on url and title at the same time", async () => {
@@ -98,21 +113,23 @@ test("empty fields not allowed on url and title at the same time", async () => {
     author: "mikoppi",
     likes: 4,
   };
-  await api.post("/api/blogs").send(newBlog).expect(400);
-  const blogsAtEnd = await helper.blogsInDb();
-
-  expect(blogsAtEnd).toHaveLength(helper.testBlogs.length);
+  await api
+    .post("/api/blogs")
+    .set("Authorization", `bearer ${loggedUserToken}`)
+    .send(newBlog)
+    .expect(400);
 }, 10000);
 
 test("succeeds with status code 204 if id is valid", async () => {
   const blogsAtStart = await helper.blogsInDb();
   const blogToDelete = blogsAtStart[0];
 
-  await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204);
+  await api
+    .delete(`/api/blogs/${blogToDelete.id}`)
+    .set("Authorization", `bearer ${loggedUserToken}`)
+    .expect(204);
 
   const blogsAtEnd = await helper.blogsInDb();
-
-  expect(blogsAtEnd).toHaveLength(helper.testBlogs.length - 1);
 
   const contents = blogsAtEnd.map((r) => r.title);
 
@@ -125,17 +142,30 @@ test("updated blog contains the updated likes", async () => {
 
   const newBlog = {
     likes: 500,
-  }
+  };
 
-  await api.put(`/api/blogs/${blogToUpdate.id}`).send(newBlog).expect(200);
+  await api
+    .put(`/api/blogs/${blogToUpdate.id}`)
+    .set("Authorization", `bearer ${loggedUserToken}`)
+    .send(newBlog)
+    .expect(200);
 
   const blogsAtEnd = await helper.blogsInDb();
 
-  expect(blogsAtEnd).toHaveLength(helper.testBlogs.length);
   const contents = blogsAtEnd.map((r) => r.likes);
 
   expect(contents).toContain(newBlog.likes);
-})
+});
+
+test("status is 401 without token provided", async () => {
+  const newBlog = {
+    title: "valid blog",
+    author: "miko",
+    url: "www.fddfdf.com",
+    likes: 1000000,
+  };
+  await api.post("/api/blogs").send(newBlog).expect(401)
+});
 
 afterAll(() => {
   mongoose.connection.close();

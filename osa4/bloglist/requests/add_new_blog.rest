@@ -1,9 +1,10 @@
 POST http://localhost:3003/api/blogs
 Content-Type: application/json
+//Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImhlbGxvIiwiaWQiOiI2MzE3MDFjZjc4NDliYTk0MGRkYTcyZmMiLCJpYXQiOjE2NjI0NTMxMzR9.RZVgyU-Ded9HGMIivtvPfZbicbb2XZghvy0tSTnWvMM
 
 {
-    "title": "test",
-    "author": "test",
-    "url": "test",
-    "likes": 1
+    "title": "tryingagain",
+    "author": "testinggfg",
+    "url": "wbcbvw.www.wbvvcw",
+    "likes": 12
 }
