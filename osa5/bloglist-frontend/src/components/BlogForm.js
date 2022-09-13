@@ -1,10 +1,11 @@
 import React from "react";
 import { useState } from "react";
+import PropTypes from "prop-types";
 
 const BlogForm = ({ createBlog }) => {
-  const [newTitle, setNewTitle] = useState();
-  const [newAuthor, setNewAuthor] = useState();
-  const [newUrl, setNewUrl] = useState();
+  const [newTitle, setNewTitle] = useState("");
+  const [newAuthor, setNewAuthor] = useState("");
+  const [newUrl, setNewUrl] = useState("");
 
   const addBlog = (e) => {
     e.preventDefault();
@@ -49,10 +50,14 @@ const BlogForm = ({ createBlog }) => {
             onChange={({ target }) => setNewUrl(target.value)}
           />
         </label>
-        <input type='submit' value='submit'/>
+        <input type="submit" value="submit" />
       </form>
     </div>
   );
+};
+
+BlogForm.propTypes = {
+  createBlog: PropTypes.func.isRequired,
 };
 
 export default BlogForm;
