@@ -12,18 +12,20 @@ const Blog = ({ blog, updateBlog, user, removeBlog }) => {
   };
 
   const remove = () => {
-    removeBlog(blog.id)
-  }
+    removeBlog(blog.id);
+  };
 
   return (
-    <div style={blogStyle}>
-      <div>
+    <div style={blogStyle} id="">
+      <div id="blog">
         {blog.title} {blog.author}
       </div>
-      <Togglable buttonLabel="view" buttonLabel2="hide">
-        <Details blog={blog} updateBlog={updateBlog} user={user}/>
-        <button onClick={remove}>remove</button>
-      </Togglable>
+      <div id="blog-details">
+        <Togglable buttonLabel="view" buttonLabel2="hide" >
+          <Details blog={blog} updateBlog={updateBlog} user={user} />
+          <button onClick={remove}>remove</button>
+        </Togglable>
+      </div>
     </div>
   );
 };
