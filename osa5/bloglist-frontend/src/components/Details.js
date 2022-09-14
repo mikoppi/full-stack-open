@@ -19,7 +19,7 @@ const Details = ({ blog, updateBlog, user }) => {
       <p>
         likes {blog.likes}
         <span>
-          <button onClick={updateLikes}>like</button>
+          <button id="like-button" onClick={updateLikes}>like</button>
         </span>
       </p>
       <p>{user.name}</p>

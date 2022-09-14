@@ -108,6 +108,13 @@ const App = () => {
     ) {
       blogService.remove(id).then(() => {
         setBlogs(blogs.filter((blog) => blog.id !== id));
+        setSuccess(true);
+        setErrorMessage(
+          `blog ${blogToRemove.title} by ${blogToRemove.author} removed`
+        );
+        setTimeout(() => {
+          setErrorMessage("");
+        }, 5000);
       });
     }
   };
@@ -136,18 +143,20 @@ const App = () => {
           </Togglable>
         </>
       )}
-      {user !== null &&
-        blogs
-          .sort((a, b) => b.likes - a.likes)
-          .map((blog) => (
-            <Blog
-              key={blog.id}
-              blog={blog}
-              updateBlog={updateBlog}
-              removeBlog={removeBlog}
-              user={user}
-            />
-          ))}
+      <div className="blogs">
+        {user !== null &&
+          blogs
+            .sort((a, b) => b.likes - a.likes)
+            .map((blog) => (
+              <Blog
+                key={blog.id}
+                blog={blog}
+                updateBlog={updateBlog}
+                removeBlog={removeBlog}
+                user={user}
+              />
+            ))}
+      </div>
     </div>
   );
 };

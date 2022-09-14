@@ -25,5 +25,4 @@ test("correct data is given to forms callback function", async () => {
   expect(addBlog.mock.calls[0][0].title).toBe("title test");
   expect(addBlog.mock.calls[0][0].author).toBe("author test");
   expect(addBlog.mock.calls[0][0].url).toBe("url test");
-  
 });

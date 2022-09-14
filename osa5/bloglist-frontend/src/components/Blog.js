@@ -16,14 +16,14 @@ const Blog = ({ blog, updateBlog, user, removeBlog }) => {
   };
 
   return (
-    <div style={blogStyle} id="">
+    <div style={blogStyle} id="blog-item">
       <div id="blog">
         {blog.title} {blog.author}
       </div>
       <div id="blog-details">
         <Togglable buttonLabel="view" buttonLabel2="hide" >
           <Details blog={blog} updateBlog={updateBlog} user={user} />
-          <button onClick={remove}>remove</button>
+          <button id="remove-button" onClick={remove}>remove</button>
         </Togglable>
       </div>
     </div>
