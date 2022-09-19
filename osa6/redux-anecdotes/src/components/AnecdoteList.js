@@ -1,7 +1,7 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { addVote } from "../reducers/anecdoteReducer";
-import { showNotification } from "../reducers/notificationReducer";
+import { updateAnecdote } from "../reducers/anecdoteReducer";
+import { setNotification } from "../reducers/notificationReducer";
 
 const AnecdoteList = () => {
   const anecdotes = [
@@ -11,7 +11,7 @@ const AnecdoteList = () => {
           anecdote.content.toLowerCase().includes(filter)
         );
       } else {
-        return anecdotes
+        return anecdotes;
       }
     }),
   ].sort((a, b) => b.votes - a.votes);
@@ -20,13 +20,11 @@ const AnecdoteList = () => {
 
   const vote = (id) => {
     console.log("vote", id);
-    dispatch(addVote(id));
+    const votedAnecdote = anecdotes.find((a) => a.id === id);
+    dispatch(updateAnecdote(votedAnecdote, id));
     dispatch(
-      showNotification(`voted ${anecdotes.find((a) => a.id === id).content}`)
+      setNotification(`voted ${anecdotes.find((a) => a.id === id).content}`, 5)
     );
-    setTimeout(() => {
-      dispatch(showNotification(""));
-    }, 5000);
   };
   return (
     <div>
