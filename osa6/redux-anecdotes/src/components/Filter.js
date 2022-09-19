@@ -1,21 +1,22 @@
 import React from "react";
-import { useDispatch } from "react-redux";
 import { placeFilter } from "../reducers/filterReducer";
+import { connect } from "react-redux";
 
-const Filter = () => {
-  const dispatch = useDispatch();
+const Filter = (props) => {
+ 
   const handleChange = (event) => {
     const value = event.target.value;
-    dispatch(placeFilter(value));
+    props.placeFilter(value);
   };
 
   const style = {
-    marginBottom: 10
-  }
+    marginBottom: 10,
+  };
   return (
     <div style={style}>
       <form>
-        <label>filter
+        <label>
+          filter
           <input onChange={handleChange} type="text" name="filter" />
         </label>
       </form>
@@ -23,4 +24,5 @@ const Filter = () => {
   );
 };
 
-export default Filter;
+const connectedFilter = connect(null, { placeFilter })(Filter);
+export default connectedFilter;
