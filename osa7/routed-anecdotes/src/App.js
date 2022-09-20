@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, Route, Routes, useParams, useNavigate } from "react-router-dom";
+import { useField } from "./hooks/index";
 
 const Menu = () => {
   const padding = {
@@ -21,24 +22,30 @@ const Menu = () => {
 };
 
 const AnecdoteList = ({ anecdotes }) => (
-    <div>
-      <h2>Anecdotes</h2>
-      <ul>
-        {anecdotes.map((anecdote) => (
-          <li key={anecdote.id}><Link to={`/${anecdote.id}`}>{anecdote.content}</Link></li>
-        ))}
-      </ul>
-    </div>
-  );
+  <div>
+    <h2>Anecdotes</h2>
+    <ul>
+      {anecdotes.map((anecdote) => (
+        <li key={anecdote.id}>
+          <Link to={`/${anecdote.id}`}>{anecdote.content}</Link>
+        </li>
+      ))}
+    </ul>
+  </div>
+);
 
 const Anecdote = ({ anecdotes }) => {
   const id = useParams().id;
   const anecdote = anecdotes.find((a) => a.id === Number(id));
   return (
     <div>
-      <h2>{anecdote.content} by {anecdote.author}</h2>
+      <h2>
+        {anecdote.content} by {anecdote.author}
+      </h2>
       <p>has {anecdote.votes} votes</p>
-      <p>for more info see <a href={anecdote.info}>{anecdote.info}</a></p>
+      <p>
+        for more info see <a href={anecdote.info}>{anecdote.info}</a>
+      </p>
     </div>
   );
 };
@@ -77,21 +84,30 @@ const Footer = () => (
 );
 
 const CreateNew = (props) => {
-  const navigate = useNavigate()
-  const [content, setContent] = useState("");
-  const [author, setAuthor] = useState("");
-  const [info, setInfo] = useState("");
+  const navigate = useNavigate();
+  const content = useField("text");
+  const author = useField("text");
+  const info = useField("text");
 
   const handleSubmit = (e) => {
     e.preventDefault();
     props.addNew({
-      content,
-      author,
-      info,
+      content: content.value,
+      author: author.value,
+      info: info.value,
       votes: 0,
     });
-    navigate("/")
+    navigate("/");
   };
+
+  const handleReset = (e) => {
+    e.preventDefault();
+    content.reset();
+    author.reset();
+    info.reset();
+  }
+
+  const excludeReset = ({ reset, ...rest }) => rest;
 
   return (
     <div>
@@ -99,29 +115,18 @@ const CreateNew = (props) => {
       <form onSubmit={handleSubmit}>
         <div>
           content
-          <input
-            name="content"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-          />
+          <input {...excludeReset(content)} />
         </div>
         <div>
           author
-          <input
-            name="author"
-            value={author}
-            onChange={(e) => setAuthor(e.target.value)}
-          />
+          <input {...excludeReset(author)} />
         </div>
         <div>
           url for more info
-          <input
-            name="info"
-            value={info}
-            onChange={(e) => setInfo(e.target.value)}
-          />
+          <input {...excludeReset(info)} />
         </div>
         <button type="submit">create</button>
+        <button onClick={handleReset} >reset</button>
       </form>
     </div>
   );
@@ -150,10 +155,10 @@ const App = () => {
   const addNew = (anecdote) => {
     anecdote.id = Math.round(Math.random() * 10000);
     setAnecdotes(anecdotes.concat(anecdote));
-    setNotification(`a new anecdote ${anecdote.content} created!`)
+    setNotification(`a new anecdote ${anecdote.content} created!`);
     setTimeout(() => {
-      setNotification("")
-    },5000)
+      setNotification("");
+    }, 5000);
   };
 
   const anecdoteById = (id) => anecdotes.find((a) => a.id === id);
