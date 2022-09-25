@@ -3,6 +3,7 @@ import userService from "../services/user";
 
 const initialState = {
   user: null,
+  userList: null,
 };
 
 const userSlice = createSlice({
@@ -15,10 +16,14 @@ const userSlice = createSlice({
     removeUser(state) {
       state.user = null;
     },
+    getAllUsers(state, action) {
+      console.log(action.payload);
+      state.userList = action.payload;
+    },
   },
 });
 
-export const { getUser, getToken, removeUser } = userSlice.actions;
+export const { getUser, getAllUsers, removeUser } = userSlice.actions;
 
 export const getUserInfo = (user) => {
   return (dispatch) => {
@@ -30,6 +35,14 @@ export const deleteUser = () => {
   return async (dispatch) => {
     const user = await userService.clearUser();
     dispatch(removeUser(user));
+  };
+};
+
+export const getUserList = () => {
+  return async (dispatch) => {
+    const users = await userService.getAll();
+    console.log(users);
+    dispatch(getAllUsers(users));
   };
 };
 

@@ -1,3 +1,4 @@
+import { Alert } from "@mui/material";
 import React from "react";
 import { useSelector } from "react-redux";
 
@@ -10,7 +11,11 @@ const Notification = () => {
     borderWidth: 1,
   };
   return (
-    <div style={notification ? style : { display: "none" }}>{notification}</div>
+    <div>
+      <Alert style={notification ? style : { display: "none" }}>
+        {notification}
+      </Alert>
+    </div>
   );
 };
 

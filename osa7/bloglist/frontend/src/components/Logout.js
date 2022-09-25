@@ -2,9 +2,16 @@ import React from "react";
 
 const Logout = ({ name, handleLogout }) => {
   return (
-    <div>
+    <div style={{ display: "flex", flexDirection: "row", color: "yellow" }}>
       <p>{name} logged in</p>
-      <button onClick={handleLogout}>logout</button>
+      <button
+        style={{
+          color: "black",
+        }}
+        onClick={handleLogout}
+      >
+        logout
+      </button>
     </div>
   );
 };

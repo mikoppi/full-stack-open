@@ -1,12 +1,11 @@
 import { useState, useEffect, useRef } from "react";
-import Blog from "./components/Blog";
 import Login from "./components/Login";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
 import Notification from "./components/Notification";
-import Logout from "./components/Logout";
-import BlogForm from "./components/BlogForm";
-import Togglable from "./components/Togglable";
+import Blogs from "./components/Blogs";
+import User from "./components/User";
+import Blog from "./components/Blog";
 import { setNotification } from "./reducers/notificationReducer";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -16,12 +15,15 @@ import {
   likeBlog,
 } from "./reducers/blogReducer";
 import { getUserInfo, deleteUser } from "./reducers/userReducer";
+import Users from "./components/Users";
+import { Route, Routes } from "react-router-dom";
+import NavBar from "./components/NavBar";
+import { Container } from "@mui/material";
 
 const App = () => {
   const dispatch = useDispatch();
   const blogs = [...useSelector((state) => state.blogs)];
   const { user } = useSelector((state) => state.user);
-  console.log(user);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
@@ -107,44 +109,57 @@ const App = () => {
   };
 
   return (
-    <div>
-      <h2>blogs</h2>
-      <Notification />
-      {user === null ? (
-        <Login
-          handleLogin={handleLogin}
-          username={username}
-          password={password}
-          handleNameChange={handleNameChange}
-          handlePasswordChange={handlePasswordChange}
-        />
-      ) : (
-        <>
-          <Logout name={user.name} handleLogout={handleLogout} />
-          <Togglable
-            buttonLabel="create new blog"
-            buttonLabel2="cancel"
-            ref={blogFormRef}
-          >
-            <BlogForm createBlog={addBlog} />
-          </Togglable>
-        </>
-      )}
-      <div className="blogs">
-        {user !== null &&
-          blogs
-            .sort((a, b) => b.likes - a.likes)
-            .map((blog) => (
-              <Blog
-                key={blog.id}
-                blog={blog}
-                updateBlog={updateBlog}
-                removeBlog={removeBlog}
-                user={user}
-              />
-            ))}
+    <Container
+      style={{
+        backgroundColor: "magenta",
+        height: "100vh",
+        margin: "0",
+        padding: "0",
+      }}
+    >
+      <div>
+        {user === null ? (
+          <>
+            <Notification />
+            <Login
+              handleLogin={handleLogin}
+              username={username}
+              password={password}
+              handleNameChange={handleNameChange}
+              handlePasswordChange={handlePasswordChange}
+            />
+          </>
+        ) : (
+          <>
+            <>
+              <NavBar user={user} handleLogout={handleLogout} />
+              <Notification />
+              <Routes>
+                <Route
+                  path="/blogs"
+                  element={
+                    <Blogs
+                      blogs={blogs}
+                      user={user}
+                      updateBlog={updateBlog}
+                      removeBlog={removeBlog}
+                      addBlog={addBlog}
+                      ref={blogFormRef}
+                    />
+                  }
+                />
+                <Route path="/users" element={<Users />} />
+                <Route path="/users/:id" element={<User />} />
+                <Route
+                  path="/blogs/:id"
+                  element={<Blog user={user} updateBlog={updateBlog} />}
+                />
+              </Routes>
+            </>
+          </>
+        )}
       </div>
-    </div>
+    </Container>
   );
 };
 

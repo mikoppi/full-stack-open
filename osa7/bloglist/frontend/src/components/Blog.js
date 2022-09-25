@@ -1,31 +1,18 @@
 import React from "react";
-import Togglable from "./Togglable";
 import Details from "./Details";
+import { useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
 
-const Blog = ({ blog, updateBlog, user, removeBlog }) => {
-  const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: "solid",
-    borderWidth: 1,
-    marginBottom: 5,
-  };
-
-  const remove = () => {
-    removeBlog(blog.id);
-  };
-
+const Blog = ({ updateBlog, user }) => {
+  const id = useParams().id;
+  const blogs = [...useSelector((state) => state.blogs)];
+  const blog = blogs.find((b) => b.id === id);
   return (
-    <div style={blogStyle} id="blog-item">
-      <div id="blog">
+    <div id="blog-item">
+      <h2 id="blog">
         {blog.title} {blog.author}
-      </div>
-      <div id="blog-details">
-        <Togglable buttonLabel="view" buttonLabel2="hide" >
-          <Details blog={blog} updateBlog={updateBlog} user={user} />
-          <button id="remove-button" onClick={remove}>remove</button>
-        </Togglable>
-      </div>
+      </h2>
+      <Details blog={blog} updateBlog={updateBlog} user={user} />
     </div>
   );
 };

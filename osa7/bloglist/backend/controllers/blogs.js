@@ -1,6 +1,7 @@
 const blogsRouter = require("express").Router();
 const Blog = require("../models/blog");
-const middleware = require("../utils/middleware")
+const middleware = require("../utils/middleware");
+const Comment = require("../models/comment");
 
 //get all blogs
 blogsRouter.get("/", async (request, response) => {
@@ -30,17 +31,21 @@ blogsRouter.post("/", middleware.userExtractor, async (request, response) => {
 });
 
 //delete one blog
-blogsRouter.delete("/:id", middleware.userExtractor, async (request, response) => {
-  const user = request.user;
-  const id = request.params.id;
-  const blog = await Blog.findById(id);
-  if (blog.user.toString() === user.id.toString()) {
-    await blog.deleteOne();
-    response.status(204).end();
-  } else {
-    response.status(401).json({ error: "Not authorised to delete" });
+blogsRouter.delete(
+  "/:id",
+  middleware.userExtractor,
+  async (request, response) => {
+    const user = request.user;
+    const id = request.params.id;
+    const blog = await Blog.findById(id);
+    if (blog.user.toString() === user.id.toString()) {
+      await blog.deleteOne();
+      response.status(204).end();
+    } else {
+      response.status(401).json({ error: "Not authorised to delete" });
+    }
   }
-});
+);
 
 //update one blog
 blogsRouter.put("/:id", async (request, response) => {
@@ -57,6 +62,22 @@ blogsRouter.put("/:id", async (request, response) => {
     new: true,
   });
   response.status(200).json(updatedBlog);
+});
+
+//comment blog
+blogsRouter.post("/:id/comments", async (request, response) => {
+  const comment = new Comment({
+    comment: request.body.comment,
+    blogId: request.params.id,
+  });
+  console.log(request.body);
+  const savedComment = await comment.save();
+  response.status(201).json(savedComment);
+});
+
+blogsRouter.get("/:id/comments", async (request, response) => {
+  const comments = await Comment.find({ blogId: request.params.id });
+  response.json(comments);
 });
 
 module.exports = blogsRouter;
