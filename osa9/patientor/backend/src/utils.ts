@@ -1,4 +1,4 @@
-import { Gender, NewPatientEntry } from "./types";
+import { Entry, Gender, NewPatientEntry } from "./types";
 
 type Fields = {
     name: unknown;
@@ -6,6 +6,7 @@ type Fields = {
     ssn: unknown;
     gender: unknown;
     occupation: unknown;
+    entries: Entry[];
 };
 
 const toNewPatientEntry = ({
@@ -14,6 +15,7 @@ const toNewPatientEntry = ({
     ssn,
     gender,
     occupation,
+    entries,
 }: Fields): NewPatientEntry => {
     const newEntry: NewPatientEntry = {
         name: parseName(name),
@@ -21,6 +23,7 @@ const toNewPatientEntry = ({
         ssn: parseSsn(ssn),
         gender: parseGender(gender),
         occupation: parseOccupation(occupation),
+        entries: entries,
     };
 
     return newEntry;

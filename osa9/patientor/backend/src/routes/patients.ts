@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import express from "express";
+import patientEntries from "../../data/patientsData";
 import patientService from "../services/patientService";
 import toNewPatientEntry from "../utils";
 
@@ -23,6 +24,12 @@ router.post("/", (req, res) => {
         }
         res.status(400).send(errorMessage);
     }
+});
+
+router.get("/:id", (req, res) => {
+    const id = req.params.id;
+    const patientById = patientEntries.find((patient) => patient.id === id);
+    res.send(patientById);
 });
 
 export default router;
