@@ -5,9 +5,10 @@ import { addPatient } from "../state/reducer";
 import React from "react";
 import axios from "axios";
 import { apiBaseUrl } from "../constants";
+import PatientEntries from "./PatientEntries";
 
 const PatientInfo = () => {
-    const [{ patients }, dispatch] = useStateValue();
+    const [{ patients, diagnoses }, dispatch] = useStateValue();
     const { id } = useParams<{ id: string | undefined }>();
 
     React.useEffect(() => {
@@ -35,6 +36,16 @@ const PatientInfo = () => {
                     </h2>
                     <p>ssn: {patients[id].ssn}</p>
                     <p>occupation: {patients[id].occupation}</p>
+                    <h2>entries</h2>
+                    <div>
+                        {patients[id].entries.map((entry) => (
+                            <PatientEntries
+                                key={entry.id}
+                                entry={entry}
+                                diagnoses={diagnoses}
+                            />
+                        ))}
+                    </div>
                 </div>
             ) : null}
         </>

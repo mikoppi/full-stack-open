@@ -6,8 +6,8 @@ import { Button, Divider, Container } from "@material-ui/core";
 import { apiBaseUrl } from "./constants";
 import { useStateValue } from "./state";
 import PatientInfo from "./components/PatientInfo";
-import { Patient } from "./types";
-import { setPatientList } from "./state/reducer";
+import { Diagnosis, Patient } from "./types";
+import { setDiagnoseList, setPatientList } from "./state/reducer";
 
 import PatientListPage from "./PatientListPage";
 import { Typography } from "@material-ui/core";
@@ -27,7 +27,18 @@ const App = () => {
                 console.error(e);
             }
         };
+        const fetchDiagnosesList = async () => {
+            try {
+                const { data: diagnoses } = await axios.get<Diagnosis[]>(
+                    `${apiBaseUrl}/diagnoses`
+                );
+                void dispatch(setDiagnoseList(diagnoses));
+            } catch (e) {
+                console.error(e);
+            }
+        };
         void fetchPatientList();
+        void fetchDiagnosesList();
     }, [dispatch]);
 
     return (
