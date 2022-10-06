@@ -29,6 +29,14 @@ export interface Discharge {
     criteria: string;
 }
 
+export type OccupationalEntryValues = Omit<
+    BaseEntry,
+    "id" | "diagnosisCodes"
+> & {
+    sickLeaveStart: string;
+    sickLeaveEnd: string;
+};
+
 export interface OccupationalHealthcareEntry extends BaseEntry {
     type: "OccupationalHealthcare";
     employerName: string;

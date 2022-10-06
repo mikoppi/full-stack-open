@@ -1,11 +1,14 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { useParams } from "react-router-dom";
 import { useStateValue } from "../state";
-import { Patient } from "../types";
+import { Entry, Patient } from "../types";
 import { addPatient } from "../state/reducer";
 import React from "react";
 import axios from "axios";
 import { apiBaseUrl } from "../constants";
 import PatientEntries from "./PatientEntries";
+import AddEntryForm from "./AddEntryForm";
+import { updateEntry } from "../state/reducer";
 
 const PatientInfo = () => {
     const [{ patients, diagnoses }, dispatch] = useStateValue();
@@ -26,6 +29,33 @@ const PatientInfo = () => {
             void fetchPatient();
         }
     }, [dispatch]);
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
+    const submitEntry = async (values: any) => {
+        const form = {
+            type: "OccupationalHealthcare",
+            date: values.date,
+            description: values.description,
+            specialist: values.specialist,
+            employerName: values.employerName,
+            sickLeave: {
+                startDate: values.sickLeaveStart,
+                endDate: values.sickLeaveEnd,
+            },
+        };
+        const data = await axios.post<Entry>(
+            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+            `${apiBaseUrl}/patients/${id}/entries`,
+            form
+        );
+        console.log(data);
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+        id ? void dispatch(updateEntry(id, data.data)) : null;
+    };
+
+    const cancelForm = (): void => {
+        console.log("canceled");
+    };
 
     return (
         <>
@@ -48,6 +78,7 @@ const PatientInfo = () => {
                     </div>
                 </div>
             ) : null}
+            <AddEntryForm onSubmit={submitEntry} onCancel={cancelForm} />
         </>
     );
 };

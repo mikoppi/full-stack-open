@@ -46,8 +46,8 @@ export enum HealthCheckRating {
 
 export type Entry =
     | HospitalEntry
-    | OccupationalHealthcareEntry
-    | HealthCheckEntry;
+    | HealthCheckEntry
+    | OccupationalHealthcareEntry;
 
 export interface PatientEntry {
     id: string;
