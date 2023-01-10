@@ -1,0 +1,6 @@
+In the ecosystem of Clojure/ClojureScript the most common tools for linting, testing and building are the following: clj-kondo, clojure.test and Leiningen. clj-kondo is a linter for Clojure and ClojureScript which helps dealing with unused variables, deprecated functions, and style violations etc. clojure.test is a testing framework for Clojure designed for doing unit tests and it is built in to the core of Clojure. Leiningen is a build tool for Clojure ecosystem and it helps with dependency management, running tests, and creating executable .jar files. There are also others that you might want to consider depending on your needs.
+
+There are some alternatives to the most popular Jenkins and Github actions. For example other popular ones are Gitlab CI, CircleCI, TeamCity and Azure Pipelines.
+
+If the team working on the application is only 6 members big, the application itself probably is not that big either. So for small- or medium-sized applications the cloud-based option is better because it is easy to configure and cheaper than setting up our own system. And there is no need for that much flexibility and control as the self-hosted option gives. But if the project team is working on has some special requirements or needs some added security, the self-hosted option is then probably better.
+
